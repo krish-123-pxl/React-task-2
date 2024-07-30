@@ -1,0 +1,16 @@
+.subject{
+    margin-right:30px;
+    cursor: pointer;
+}
+.btn{
+    text-align: center;
+    padding: 14px 30%;
+    font-size: 1.3rem;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: .2s all;
+    border: 1px solid gray;
+}
+.btn:hover{
+    background-color: rgb(216, 216, 216);
+}
