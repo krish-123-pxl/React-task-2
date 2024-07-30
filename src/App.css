@@ -9,7 +9,8 @@
     padding: 20px;
     width: 30%;
     padding-inline:40px ;
-    margin: 50px auto;
+    margin: 50px auto;  
+    position: relative;
 }
 label{
   font-size: 1.3rem;
