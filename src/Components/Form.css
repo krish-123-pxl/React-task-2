@@ -41,3 +41,13 @@ th,td{
     text-align: center;
     padding:10px 30px;
 }
+.delete:hover{
+    cursor: pointer;
+    color: red;
+    transition: .2s all;
+}
+.edit:hover{
+    cursor: pointer;
+    color:blue;
+    transition: .2s all;
+}

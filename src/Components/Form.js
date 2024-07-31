@@ -4,13 +4,16 @@ import Input from "./Input.js";
 
 export default function Form() {
   const [error, setError] = useState({});
-  
+
   const [name, setName] = useState("");
   const [gender, setGender] = useState("");
   const [subject, setSubject] = useState([]);
 
   const [flag, setFlag] = useState(false);
+  const [editFlag,setEditFlag] = useState(false);
   const [records, setRecords] = useState([]);
+  
+  let idis = [];
 
   useEffect(() => {
     if (localStorage.getItem("data")) {
@@ -100,24 +103,44 @@ export default function Form() {
     setError(newError);
 
     // console.log(flag);
-    if (flag) {
+    if (flag && !editFlag) {
       storeDataInLocalStorage();
+    }
+    else{
+      editField();
     }
 
   }
   const storeDataInLocalStorage = () => {
     // console.log("stored");
+    let date = new Date();
     const object = {
       name: name,
       gender: gender,
       subjects: subject,
-      stream: selectionRef.current.value
+      stream: selectionRef.current.value,
+      id:date.getMilliseconds()
     }
     let copyRecords = [...records];
     copyRecords.push(object);
     setRecords(copyRecords);
     console.log(copyRecords)
     localStorage.setItem("data", JSON.stringify(copyRecords));
+  }
+
+  const deleteField = (index)=>{
+      let allRecords = JSON.parse(localStorage.getItem("data"));
+      let agree = confirm("Are you sure to delete");
+      if(agree){
+        allRecords.splice(index,1);
+        setRecords(allRecords);
+        localStorage.setItem("data",JSON.stringify(allRecords));
+      }
+  }
+
+  const editField = (index)=>{
+    // alert()
+    
   }
 
 
@@ -220,15 +243,23 @@ export default function Form() {
             <th>Gender</th>
             <th>Subjects</th>
             <th>Stream</th>
+            <th>Modify</th>
           </thead>
           <tbody>
             {records.map((record, index) => {
+              idis[index] = record.id; 
               return (
                 <tr key={index}>
                   <td>{record.name}</td>
                   <td>{record.gender}</td>
                   <td>{""+record.subjects}</td>
                   <td>{record.stream}</td>
+                  <td>
+                    <tr>
+                    <td className="delete" onClick={() => deleteField(index)}><i class="fa-solid fa-trash"></i></td>
+                    <td className="edit" onClick={()=> editField(index)}><i class="fa-solid fa-pen-to-square"></i></td>
+                    </tr>
+                  </td>
                 </tr>
               )
             })}
