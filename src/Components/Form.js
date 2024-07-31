@@ -3,21 +3,18 @@ import './Form.css';
 import Input from "./Input.js";
 
 export default function Form() {
+  const [error, setError] = useState({});
+  
   const [name, setName] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [addErrorMsg, setAddErrorMsg] = useState("");
-  const [selectionErrorMsg, setSelectionErrorMsg] = useState("");
   const [gender, setGender] = useState("");
-  const [genderErrorMsg, setGenderErrorMsg] = useState("");
   const [subject, setSubject] = useState([]);
-  const [subjecErrorMsg, setSubjectErrorMsg] = useState("");
+
   const [flag, setFlag] = useState(false);
   const [records, setRecords] = useState([]);
 
   useEffect(() => {
     if (localStorage.getItem("data")) {
       setRecords(JSON.parse(localStorage.getItem("data")));
-
       // console.log(localStorage.getItem("data"))
     }
   }, []);
@@ -51,54 +48,56 @@ export default function Form() {
   const selectionRef = useRef();
   const tableRef = useRef();
 
+  const newError = {};
+
   const validate = (e) => {
 
     e.preventDefault();
     if (name.length < 2) {
-      setErrorMsg("Name should be atleast 2 characters !");
+      newError.nameError = "Name should be atleast 2 characters !";
       setFlag(false);
     }
     else if (/(?=.*\d)/.test(Number(name))) {
-      setErrorMsg("Name Can't have numbers !");
+      newError.nameError = "Name Can't have numbers !";
       setFlag(false);
     }
     else {
-      setErrorMsg("");
+      newError.nameError = "";
       setFlag(true);
     }
     if (addRef.current.value.length < 5) {
-      setAddErrorMsg("Invalid Address !");
+      newError.addError = "Invalid Address !";
       setFlag(false);
     }
     else {
-      setAddErrorMsg("");
+      newError.addError = "";
       setFlag(true);
     }
     if (selectionRef.current.value == "select") {
-      setSelectionErrorMsg("Please a select a stream !");
+      newError.streamError = "Please a select a stream !";
       setFlag(false);
     }
     else {
-      setSelectionErrorMsg("");
+      newError.streamError = "";
       setFlag(true);
     }
     if (gender !== "Male" && gender !== "Female") {
-      setGenderErrorMsg("Please Select A Gender !");
+      newError.genderError = "Please Select a Gender !";
       setFlag(false);
     }
     else {
-      setGenderErrorMsg("");
+      newError.genderError = "";
       setFlag(true);
     }
-    // console.log(subject);
     if (subject.length < 2 || subject.length > 3) {
-      setSubjectErrorMsg("Minimum 2 and maximum 3 selection are allowed !");
+      newError.subjecError = "Minimum 2 and maximum 3 selection are allowed !";
       setFlag(false);
     }
     else {
-      setSubjectErrorMsg("");
+      newError.subjecError = "";
       setFlag(true);
     }
+    setError(newError);
 
     // console.log(flag);
     if (flag) {
@@ -136,13 +135,13 @@ export default function Form() {
             onChange={handleChange}
             placeholder="Enter Your Name"
             style={{ marginBlock: '20px' }}
-          /><p style={{ position: 'absolute', top: '100px', color: 'red' }}>{errorMsg}</p>
+          /><p style={{ position: 'absolute', top: '100px', color: 'red' }}>{error.nameError}</p>
           <label>Gender:</label>
           <label for='male'>Male:</label>
           <input type="radio" onChange={handleGenderChange} id="male" name="gender" value='Male' />
           <label for='female'> Female:</label>
           <input type="radio" onChange={handleGenderChange} id="female" name="gender" value='Female' />
-          <p style={{ position: 'absolute', top: '138px', color: 'red' }}>{genderErrorMsg}</p>
+          <p style={{ position: 'absolute', top: '138px', color: 'red' }}>{error.genderError}</p>
           <div className="subjectBox" style={{ marginBlock: '20px' }}>
             <h3>Subject:</h3>
             <Input
@@ -193,7 +192,7 @@ export default function Form() {
               value="Mathematics"
               onChange={handleSubjectChange}
             /><br />
-            <p style={{ position: 'absolute', top: '300px', color: 'red' }}>{subjecErrorMsg}</p>
+            <p style={{ position: 'absolute', top: '300px', color: 'red' }}>{error.subjecError}</p>
 
             <div className="select" style={{ marginBlock: '20px' }}>
               <label for='stream'>Stream:</label>
@@ -203,11 +202,11 @@ export default function Form() {
                 <option value='science'>Science</option>
                 <option value='commerce'>Commerce</option>
               </select>
-              <p style={{ position: 'absolute', top: '345px', color: 'red' }}>{selectionErrorMsg}</p>
+              <p style={{ position: 'absolute', top: '345px', color: 'red' }}>{error.streamError}</p>
             </div>
             <div className="address">
               <label for='address'>Address:</label> <br />
-              <textarea ref={addRef} rows={3} cols={30} id="address" placeholder="Enter your address" /><p style={{ position: 'absolute', top: '440px', color: 'red' }}>{addErrorMsg}</p>
+              <textarea ref={addRef} rows={3} cols={30} id="address" placeholder="Enter your address" /><p style={{ position: 'absolute', top: '440px', color: 'red' }}>{error.addError}</p>
             </div>
             <div style={{ textAlign: 'center', marginTop: '5px' }}>
               <button style={{ marginTop: '15px' }} className="btn" onClick={validate}>Submit</button>
