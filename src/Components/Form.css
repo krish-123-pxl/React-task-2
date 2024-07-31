@@ -11,6 +11,33 @@
     transition: .2s all;
     border: 1px solid gray;
 }
+.mainContainer{
+    display: flex; 
+    align-items: center; 
+    justify-content: space-around;
+}
+.formContainer{
+    box-shadow: 0px 0px 6px black;
+    border-radius: 6px;
+    padding: 20px;
+    width: 30%;
+    padding-inline:40px ;
+    margin-top: 20px ;  
+    margin-left: 100px;
+    position: relative;
+}
 .btn:hover{
     background-color: rgb(216, 216, 216);
+}
+table{
+    margin-top: -200px;
+    border-collapse: collapse;
+}
+thead{
+    height: 20px;
+}
+th,td{
+    border: 2px solid black;
+    text-align: center;
+    padding:10px 30px;
 }

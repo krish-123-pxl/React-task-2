@@ -3,8 +3,9 @@ import React from "react";
 export default function Label(props){
     return (
         <>
-            <input type={props.type} id={props.id}/>
-            <label className="subject" name={props.name} for={props.for}>{props.subject}</label>
+            <input onChange={props.onChange} type={props.type} id={props.id} value={props.value}/>
+            <label className="subject" name={props.name} htmlFor
+            ={props.for}>{props.subject}</label>
         </>
     );
 }

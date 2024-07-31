@@ -3,15 +3,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-.container{
-    box-shadow: 0px 0px 6px black;
-    border-radius: 6px;
-    padding: 20px;
-    width: 30%;
-    padding-inline:40px ;
-    margin: 50px auto;  
-    position: relative;
-}
 label{
   font-size: 1.3rem;
 }
