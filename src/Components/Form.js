@@ -5,13 +5,16 @@ import Input from "./Input.js";
 export default function Form() {
   const [error, setError] = useState({});
 
-  const [name, setName] = useState("");
-  const [gender, setGender] = useState("");
-  const [subject, setSubject] = useState([]);
+  let [name, setName] = useState("");
+  let [gender, setGender] = useState("");
+  let [subject, setSubject] = useState([]);
+  let [stream,setStream] = useState('');
+  let [addr,setAddr] = useState('');
 
   const [flag, setFlag] = useState(false);
   const [editFlag,setEditFlag] = useState(false);
   const [records, setRecords] = useState([]);
+  const [editIndex,setEditIndex] = useState('');
   
   let idis = [];
 
@@ -26,6 +29,7 @@ export default function Form() {
 
   const handleChange = (e) => {
     setName(e.target.value);
+
   }
   const handleGenderChange = (e) => {
     setGender(e.target.value);
@@ -50,10 +54,14 @@ export default function Form() {
   const addRef = useRef();
   const selectionRef = useRef();
   const tableRef = useRef();
+  let subjectRef = useRef();
+  const formRef = useRef();
 
   const newError = {};
 
   const validate = (e) => {
+    // console.log(editFlag);
+    // console.log(editIndex)
 
     e.preventDefault();
     if (name.length < 2) {
@@ -68,12 +76,14 @@ export default function Form() {
       newError.nameError = "";
       setFlag(true);
     }
-    if (addRef.current.value.length < 5) {
+    
+    if (addr.length < 5) {
       newError.addError = "Invalid Address !";
       setFlag(false);
     }
     else {
       newError.addError = "";
+      setAddr(addRef.current.value);
       setFlag(true);
     }
     if (selectionRef.current.value == "select") {
@@ -101,37 +111,61 @@ export default function Form() {
       setFlag(true);
     }
     setError(newError);
-
-    // console.log(flag);
-    if (flag && !editFlag) {
+    // console.log(editFlag);
+    
+    if(flag && !editFlag) {
       storeDataInLocalStorage();
     }
-    else{
-      editField();
+    if(editFlag){
+      // console.log("editing")
+      let entireRecord = JSON.parse(localStorage.getItem("data"));
+      // console.log(entireRecord[editIndex])
+      entireRecord[editIndex].name = name;
+      entireRecord[editIndex].gender =gender;
+      entireRecord[editIndex].address = addr;
+      entireRecord[editIndex].subjects = subject;
+      entireRecord[editIndex].stream = selectionRef.current.value;
+      
+      if(flag && !(addr.length < 5 )){
+        localStorage.setItem("data",JSON.stringify(entireRecord));
+      }
+      
     }
+    
+    
+    
+    // console.log(addr);
+  
 
   }
   const storeDataInLocalStorage = () => {
     // console.log("stored");
     let date = new Date();
-    const object = {
-      name: name,
-      gender: gender,
-      subjects: subject,
-      stream: selectionRef.current.value,
-      id:date.getMilliseconds()
+    if(addr.length < 5){
+      
     }
-    let copyRecords = [...records];
-    copyRecords.push(object);
-    setRecords(copyRecords);
-    console.log(copyRecords)
-    localStorage.setItem("data", JSON.stringify(copyRecords));
+    else{
+      const object = {
+        name: name,
+        gender: gender,
+        subjects: subject,
+        stream: selectionRef.current.value,
+        address:addr,
+        id:date.getMilliseconds()
+      }
+        let copyRecords = [...records];
+        copyRecords.push(object);
+        setRecords(copyRecords);
+        console.log(copyRecords)
+        localStorage.setItem("data", JSON.stringify(copyRecords));
+    
+    }
   }
 
   const deleteField = (index)=>{
       let allRecords = JSON.parse(localStorage.getItem("data"));
-      let agree = confirm("Are you sure to delete");
-      if(agree){
+      // let agree = confirm("Are you sure to delete");
+      if(1){
         allRecords.splice(index,1);
         setRecords(allRecords);
         localStorage.setItem("data",JSON.stringify(allRecords));
@@ -139,15 +173,60 @@ export default function Form() {
   }
 
   const editField = (index)=>{
-    // alert()
+    setEditIndex(index);
+    setEditFlag(true);
+    formRef.current.reset();
+    let wholeRecords = JSON.parse(localStorage.getItem("data"));
+    // console.log(wholeRecords[index].name);
     
+    setName(wholeRecords[index].name);
+    addRef.current.value = wholeRecords[index].address; 
+    setAddr(wholeRecords[index].address);
+    
+    let radios = document.getElementsByName("gender");
+    for(let i=0;i<radios.length;i++){
+      if(radios[i].value == wholeRecords[index].gender){
+        radios[i].checked = true;
+        setGender(radios[i].value);
+        break;
+      }
+    }
+    let selectStream = document.getElementsByTagName("option");
+    for(let i=0;i<selectStream.length;i++){
+      // console.log(wholeRecords[index].stream);
+      if(selectStream[i].value == wholeRecords[index].stream){
+        selectStream[i].selected = true;
+        setStream(selectStream[i].value);
+        break;
+      }
+      
+    }
+    let subjectList = document.getElementsByTagName("Input");
+    let subjectFromStorage = wholeRecords[index].subjects;
+    setSubject(wholeRecords[index].subjects);
+
+    // console.log(subjectFromStorage);
+    for(let i=0;i<subjectList.length;i++){
+      // console.log(subjectList[i].value);
+      for(let j=0;j<subjectFromStorage.length;j++){
+        // console.log(subjectFromStorage[j]);
+        if(subjectList[i].value == subjectFromStorage[j]){
+          subjectList[i].checked = true;
+          break;
+        }
+      }
+    }
+
+    
+
+
   }
 
 
   return (
     <>
       <div className="mainContainer">
-        <form className="formContainer">
+        <form className="formContainer" ref={formRef}>
           <h1 style={{ textAlign: 'center' }}>Form</h1>
           <label for="name">Name:</label>
           <input
@@ -168,7 +247,7 @@ export default function Form() {
           <div className="subjectBox" style={{ marginBlock: '20px' }}>
             <h3>Subject:</h3>
             <Input
-              // ref={subjectRef}
+              ref={subjectRef}
               type='checkbox'
               name='hindi'
               for='hindi'
@@ -178,7 +257,7 @@ export default function Form() {
               onChange={handleSubjectChange}
             /><br />
             <Input
-              // ref={subjectRef}
+              ref={subjectRef}
               type='checkbox'
               name='english'
               for='english'
@@ -188,6 +267,7 @@ export default function Form() {
               onChange={handleSubjectChange}
             /><br />
             <Input
+              ref={subjectRef}
               type='checkbox'
               name='physics'
               for='physics'
@@ -197,6 +277,7 @@ export default function Form() {
               onChange={handleSubjectChange}
             /><br />
             <Input
+              ref={subjectRef}
               type='checkbox'
               name='chemistry'
               for='chemistry'
@@ -206,12 +287,12 @@ export default function Form() {
               onChange={handleSubjectChange}
             /><br />
             <Input
+              ref={subjectRef}
               type='checkbox'
               name='math'
               for='mathematics'
               id='mathematics'
-              subject='
-                  Mathematics'
+              subject='Mathematics'
               value="Mathematics"
               onChange={handleSubjectChange}
             /><br />
@@ -229,7 +310,7 @@ export default function Form() {
             </div>
             <div className="address">
               <label for='address'>Address:</label> <br />
-              <textarea ref={addRef} rows={3} cols={30} id="address" placeholder="Enter your address" /><p style={{ position: 'absolute', top: '440px', color: 'red' }}>{error.addError}</p>
+              <textarea onChange={(e)=>{setAddr(e.target.value)}} ref={addRef} rows={3} cols={30} id="address" placeholder="Enter your address" /><p style={{ position: 'absolute', top: '440px', color: 'red' }}>{error.addError}</p>
             </div>
             <div style={{ textAlign: 'center', marginTop: '5px' }}>
               <button style={{ marginTop: '15px' }} className="btn" onClick={validate}>Submit</button>
@@ -243,6 +324,7 @@ export default function Form() {
             <th>Gender</th>
             <th>Subjects</th>
             <th>Stream</th>
+            <th>Address</th>
             <th>Modify</th>
           </thead>
           <tbody>
@@ -254,11 +336,12 @@ export default function Form() {
                   <td>{record.gender}</td>
                   <td>{""+record.subjects}</td>
                   <td>{record.stream}</td>
+                  <td>{record.address}</td>
                   <td>
-                    <tr>
-                    <td className="delete" onClick={() => deleteField(index)}><i class="fa-solid fa-trash"></i></td>
-                    <td className="edit" onClick={()=> editField(index)}><i class="fa-solid fa-pen-to-square"></i></td>
-                    </tr>
+                    <div style={{display:"flex",gap:"10px"}}>
+                    <span className="delete" onClick={() => deleteField(index)}><i class="fa-solid fa-trash"></i></span>
+                    <span className="edit" onClick={()=> editField(index)}><i class="fa-solid fa-pen-to-square"></i></span>
+                    </div>
                   </td>
                 </tr>
               )
