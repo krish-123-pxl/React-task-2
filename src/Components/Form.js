@@ -10,6 +10,7 @@ export default function Form() {
   let [subject, setSubject] = useState([]);
   let [stream,setStream] = useState('');
   let [addr,setAddr] = useState('');
+  let [isEditing,setIsEditing] = useState(false);
 
   const [flag, setFlag] = useState(false);
   const [editFlag,setEditFlag] = useState(false);
@@ -113,10 +114,10 @@ export default function Form() {
     setError(newError);
     // console.log(editFlag);
     
-    if(flag && !editFlag) {
+    if(flag && !editFlag && !isEditing) {
       storeDataInLocalStorage();
     }
-    if(editFlag){
+    if(editFlag && isEditing){
       // console.log("editing")
       let entireRecord = JSON.parse(localStorage.getItem("data"));
       // console.log(entireRecord[editIndex])
@@ -126,7 +127,7 @@ export default function Form() {
       entireRecord[editIndex].subjects = subject;
       entireRecord[editIndex].stream = selectionRef.current.value;
       
-      if(flag && !(addr.length < 5 )){
+      if(flag && !(addr.length < 5 ) && editFlag){
         localStorage.setItem("data",JSON.stringify(entireRecord));
       }
       
@@ -175,6 +176,7 @@ export default function Form() {
   const editField = (index)=>{
     setEditIndex(index);
     setEditFlag(true);
+    setIsEditing(true);
     formRef.current.reset();
     let wholeRecords = JSON.parse(localStorage.getItem("data"));
     // console.log(wholeRecords[index].name);
@@ -227,6 +229,7 @@ export default function Form() {
     <>
       <div className="mainContainer">
         <form className="formContainer" ref={formRef}>
+          {isEditing?<p onClick={()=>{setIsEditing(false);setName("");setEditFlag(false)}} style={{position:'absolute',top:'10px',cursor:'pointer',right:'20px'}}>Cancel edit</p>:null}
           <h1 style={{ textAlign: 'center' }}>Form</h1>
           <label for="name">Name:</label>
           <input
@@ -338,7 +341,7 @@ export default function Form() {
                   <td>{record.stream}</td>
                   <td>{record.address}</td>
                   <td>
-                    <div style={{display:"flex",gap:"10px"}}>
+                    <div style={{display:"flex",gap:"20px"}}>
                     <span className="delete" onClick={() => deleteField(index)}><i class="fa-solid fa-trash"></i></span>
                     <span className="edit" onClick={()=> editField(index)}><i class="fa-solid fa-pen-to-square"></i></span>
                     </div>
